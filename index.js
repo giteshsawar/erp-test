@@ -1,3 +1,4 @@
+require("app-module-path").addPath(__dirname);
 const express = require("express"),
   config = require("./config/");
 const { errors } = require("celebrate"),

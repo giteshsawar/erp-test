@@ -16,12 +16,6 @@ let options = {
     },
     host: constants.baseUrl,
     basePath: "/api/v1",
-    tags: [
-      // {
-      //     name: 'users',
-      //     description: 'API for users in the system'
-      // },
-    ],
   },
   apis: [`${__dirname}/v1/modules/**/route.js`],
 };

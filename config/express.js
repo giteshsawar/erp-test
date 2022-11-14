@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
 
 const logger = require("./logger");
 
@@ -14,8 +15,10 @@ module.exports = function (app, config) {
 
   // set up logger
   app.use(morgan("dev", { stream: logger.stream }));
-
+  app.use(bodyParser.json({ limit: "50mb" }));
+  app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
   app.use(cookieParser());
+  //app.use(express.static(`${config.root}/web/public`));
 
   // load routers
   app.use(`/api/${config.app.webApi}`, require("../app/mainRouter"));

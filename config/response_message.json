@@ -1,1 +1,18 @@
-{}
+{
+  "USER_NOT_FOUND": "User not found",
+  "SIGNUP": {
+    "ALREADY_EXISTS": "Account with this phone number is already exist",
+    "NOT_VERIFYIED": "Your number is already registered.Please verify with otp sent to your phone.",
+    "SUCCESS": "Account created.Please verify your number with otp sent to your number."
+  },
+  "VERIFY_OTP": {
+    "EXPIRE_OTP": "Otp is expired.",
+    "INVALID_OTP": "OTP not match",
+    "SUCCESS": "Verification successful",
+    "RESEND_OTP": "OTP sent successfuly"
+  },
+  "LOGIN": {
+    "SUCCESS": "Login successful",
+    "WORNG_PASSWORD": "Password not match"
+  }
+}
