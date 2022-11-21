@@ -5,20 +5,22 @@ const logger = require("../../../../../config/logger");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 module.exports = (req, res, next) => {
+  // return next();
+
   let token = req.headers["x-auth-token"];
   if (!token) {
     let body = req.body.query;
-    let text =
+    // let text =
       /(user_signup)|(verify_otp)|(resend_otp)|(user_login)|(login_otp)|(reset_forgot_password)/;
-    let match = body.match(text);
-    if (!match) {
-      logger.error("Auth token is required");
-      return res.status(401).json({
-        success: false,
-        status: 401,
-        message: "provide auth token",
-      });
-    }
+    // let match = body.match(text);
+    // if (!match) {
+    //   logger.error("Auth token is required");
+    //   return res.status(401).json({
+    //     success: false,
+    //     status: 401,
+    //     message: "provide auth token",
+    //   });
+    // }
     return next();
   }
   let secretOrKey = config.jwtSecret;

@@ -17,8 +17,6 @@ app.use(expressSanitizer());
 mongoose.connect(
   config.db,
   {
-    //auto_reconnect: true,
-    //connectWithNoPrimary: true,
     useNewUrlParser: true,
     useUnifiedTopology: true,
   },

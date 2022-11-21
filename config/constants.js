@@ -1,13 +1,13 @@
 const env = require("./env"),
   response_msgs = require("./response_message.json");
 
-let constantObj = {
+var constantObj = {
   response_msgs: response_msgs,
 };
 
 switch (env) {
-  case "production":
-    constantsObj.baseUrl = "http://localhost:4050/api/v1";
+  case "development":
+    constantObj.baseUrl = "http://localhost:4050";
     break;
 }
 
