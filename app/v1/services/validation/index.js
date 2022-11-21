@@ -33,6 +33,22 @@ const ValidatorSchema = {
         password: Joi.string().required(),
       }),
   },
+  reset_forgot_password: {
+    body: Joi.object()
+      .required()
+      .keys({
+        phone_number: Joi.string().min(10).max(10).required(),
+        password: Joi.string().min(8).required(),
+        otp: Joi.string().required(),
+      }),
+  },
+  update_user: {
+    body: Joi.object().required().keys({
+      name: Joi.string(),
+      birth_date: Joi.date(),
+      id_proof: Joi.string(),
+    }),
+  },
 };
 
 module.exports = ValidatorSchema;

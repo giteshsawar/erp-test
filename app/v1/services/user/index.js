@@ -2,10 +2,10 @@ const User = require("./model");
 const constant = require("../../../../config/constants").response_msgs;
 const Presets = require("../../../../utils/presets");
 const logger = require("../../../../config/logger");
+const ObjectId = require("mongoose").Types.ObjectId;
 
 const user_signup = async (data) => {
   try {
-    console.log(data);
     let exist = await User.findOne({ phone_number: data.phone_number });
     if (exist) {
       if (exist.is_verified) {
@@ -37,21 +37,23 @@ const user_signup = async (data) => {
         expire_at: Date.now() + Presets.otp_expiry_time,
       },
     });
-    delete new_user.password;
+    // delete new_user.password;
     return {
       success: true,
       status: 200,
-      mesage: constant.SIGNUP.SUCCESS,
+      mesage: "created",
+      //constant.SIGNUP.SUCCESS,
     };
   } catch (error) {
     console.log(error);
-    logger.error(error.mesage);
+    logger.error(error.toString());
     throw error;
   }
 };
 
 const verify_otp = async (phone_number, otp) => {
   try {
+    console.log(phone_number, otp);
     let user = await User.findOne({ phone_number: phone_number });
     if (!user) {
       return {
@@ -60,6 +62,7 @@ const verify_otp = async (phone_number, otp) => {
         message: constant.USER_NOT_FOUND,
       };
     }
+    console.log("helloooo");
     if (user.phone_otp.expire_at < Date.now()) {
       return {
         success: false,
@@ -76,6 +79,7 @@ const verify_otp = async (phone_number, otp) => {
     }
     user.phone_otp.otp = null;
     user.phone_otp.expire_at = null;
+    user.is_verified = true;
     await user.save();
     const token = await user.gen_auth_token();
     delete user.password;
@@ -87,7 +91,7 @@ const verify_otp = async (phone_number, otp) => {
       user: user,
     };
   } catch (error) {
-    logger.error(error.mesage);
+    logger.error(error.toString());
     throw error;
   }
 };
@@ -129,10 +133,7 @@ const user_login = async (phone_number, password) => {
       };
     }
     if (user.valid_password(password)) {
-      console.log("hello");
       let token = await user.gen_auth_token();
-      console.log(token);
-      //delete user.password;
       return {
         success: true,
         status: 200,
@@ -147,7 +148,115 @@ const user_login = async (phone_number, password) => {
       mesage: constant.LOGIN.WORNG_PASSWORD,
     };
   } catch (error) {
-    logger.error(erroe.message);
+    logger.error(error.message);
+    throw error;
+  }
+};
+
+const login_otp = async (phone_number) => {
+  try {
+    let user = await User.findOne({ phone_number: phone_number });
+    if (!user) {
+      return {
+        success: false,
+        status: 404,
+        message: constant.USER_NOT_FOUND,
+      };
+    }
+    if (!user.is_verified) {
+      console.log(user);
+      return {
+        success: false,
+        status: 400,
+        mesage: constant.LOGIN.NOT_VERIFYIED,
+      };
+    }
+    user.phone_otp.otp = Math.floor(100000 + Math.random() * 900000);
+    user.phone_otp.expire_at = Date.now() + Presets.otp_expiry_time;
+    await user.save();
+    //FIXME: set to send otp to phone number.
+    return {
+      success: true,
+      status: 200,
+      message: constant.LOGIN.OTP_SENT,
+    };
+  } catch (error) {
+    logger.error(error.mesage);
+    throw error;
+  }
+};
+
+const reset_forgot_password = async (phone_number, password, otp) => {
+  try {
+    let user = await User.findOne({ phone_number: phone_number });
+    if (!user) {
+      return {
+        success: false,
+        status: 404,
+        message: constant.USER_NOT_FOUND,
+      };
+    }
+    if (!user.is_verified) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.LOGIN.NOT_VERIFYIED,
+      };
+    }
+    if (user.phone_otp.expire_at < Date.now()) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.VERIFY_OTP.EXPIRE_OTP,
+      };
+    }
+    if (user.phone_otp.otp !== otp) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.VERIFY_OTP.INVALID_OTP,
+      };
+    }
+    user.password = user.generate_hash(password);
+    user.phone_otp.otp = null;
+    user.phone_otp.expire_at = null;
+    await user.save();
+    return {
+      success: true,
+      status: 200,
+      mesage: constant.LOGIN.RESET_FORGOT_PASSWORD,
+    };
+  } catch (error) {
+    logger.error(error.message);
+    throw error;
+  }
+};
+
+const update_user = async (update, user_id) => {
+  try {
+    if (!ObjectId.isValid(user_id)) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.INVALID_OBJECTID,
+      };
+    }
+    let user = await User.findOne({ _id: user_id });
+    if (!user) {
+      return {
+        success: false,
+        status: 404,
+        message: constant.USER_NOT_FOUND,
+      };
+    }
+    await User.findByIdAndUpdate({ _id: user_id }, update, { new: true });
+    return {
+      success: true,
+      status: 200,
+      message: constant.USER.UPDATE,
+    };
+  } catch (error) {
+    logger.error(error.message);
     throw error;
   }
 };
@@ -157,4 +266,17 @@ module.exports = {
   verify_otp,
   resend_otp,
   user_login,
+  login_otp,
+  reset_forgot_password,
+  update_user,
 };
+
+// module.exports = {
+//   user_signup: (data, req) => {
+//     console.log(req);
+//     user_signup(data);
+//   },
+//   verify_otp: (data) =>
+//     verify_otp(data.userInput.phone_number, data.userInput.otp),
+//   user_login: (phone_number, password) => user_login(phone_number, password),
+// };

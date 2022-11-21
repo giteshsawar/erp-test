@@ -1,5 +1,6 @@
 {
   "USER_NOT_FOUND": "User not found",
+  "INVALID_OBJECTID": "Invalid mongo ID",
   "SIGNUP": {
     "ALREADY_EXISTS": "Account with this phone number is already exist",
     "NOT_VERIFYIED": "Your number is already registered.Please verify with otp sent to your phone.",
@@ -9,10 +10,22 @@
     "EXPIRE_OTP": "Otp is expired.",
     "INVALID_OTP": "OTP not match",
     "SUCCESS": "Verification successful",
-    "RESEND_OTP": "OTP sent successfuly"
+    "RESEND_OTP": "OTP sent successfully"
   },
   "LOGIN": {
     "SUCCESS": "Login successful",
-    "WORNG_PASSWORD": "Password not match"
+    "WORNG_PASSWORD": "Password not match",
+    "NOT_VERIFYIED": "User is not verifyid.",
+    "OTP_SENT": "Your OTP is sent to your phonr number.",
+    "RESET_FORGOT_PASSWORD": "Password has been changed successfully"
+  },
+  "USER": {
+    "UPDATE": "User updated successfully."
+  },
+  "COMPANY": {
+    "CREATED": "Company created.",
+    "NOT_FOUND": "Company not found",
+    "UPDATE": "Uodate successfully",
+    "NO_RECORD": "No record found"
   }
 }
