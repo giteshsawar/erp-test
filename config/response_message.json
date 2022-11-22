@@ -1,6 +1,7 @@
 {
   "USER_NOT_FOUND": "User not found",
   "INVALID_OBJECTID": "Invalid mongo ID",
+  "INVALID_TOKEN": "Invalid or expired token",
   "SIGNUP": {
     "ALREADY_EXISTS": "Account with this phone number is already exist",
     "NOT_VERIFYIED": "Your number is already registered.Please verify with otp sent to your phone.",
@@ -25,7 +26,7 @@
   "COMPANY": {
     "CREATED": "Company created.",
     "NOT_FOUND": "Company not found",
-    "UPDATE": "Uodate successfully",
+    "UPDATE": "Update successfully",
     "NO_RECORD": "No record found"
   }
 }

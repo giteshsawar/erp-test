@@ -14,34 +14,34 @@ module.exports = (router) => {
     */
 
   /**
-* @swagger
-* /user/sign_up:
-*   post:
-*     description: user local signup
-*     tags:
-*     - userAuth
-*     produces:
-*     - application/json
-*     parameters:
-*     - name: phone_number
-*       description: user's phone number.
-*       in: body
-*       required: true
-*       type: string
-*     - name: name
-*       description: user's name.
-*       in: body
-*       required: true
-*       type: string
-*     - name: password
-*       description: user's password.
-*       in: body
-*       required: true
-*       type: string
-*     responses:
-*     201:
-*        description: user signup success, verification email sent
-*/
+   * @swagger
+   * /user/sign_up:
+   *   post:
+   *     description: user local signup
+   *     tags:
+   *     - userAuth
+   *     produces:
+   *     - application/json
+   *     parameters:
+   *     - name: phone_number
+   *       description: user's phone number.
+   *       in: body
+   *       required: true
+   *       type: string
+   *     - name: name
+   *       description: user's name.
+   *       in: body
+   *       required: true
+   *       type: string
+   *     - name: password
+   *       description: user's password.
+   *       in: body
+   *       required: true
+   *       type: string
+   *     responses:
+   *     201:
+   *        description: user signup success, verification email sent
+   */
   router.post(
     "/user/sign_up",
     limiter,
@@ -63,12 +63,12 @@ module.exports = (router) => {
     controller.resend_otp
   );
 
-  router.post(
-    "/user/login",
-    limiter,
-    celebrate(request_validation.login),
-    controller.user_login
-  );
+  // router.post(
+  //   "/user/login",
+  //   limiter,
+  //   celebrate(request_validation.login),
+  //   controller.user_login
+  // );
 
   router.post(
     "/user/login_otp",

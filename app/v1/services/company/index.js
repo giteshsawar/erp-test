@@ -5,7 +5,6 @@ const ObjectId = require("mongoose").Types.ObjectId;
 
 const create_company = async (data) => {
   try {
-    console.log(data);
     let new_company = await Company.create(data);
     return {
       success: true,

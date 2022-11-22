@@ -5,22 +5,9 @@ const logger = require("../../../../../config/logger");
 const ObjectId = require("mongoose").Types.ObjectId;
 
 module.exports = (req, res, next) => {
-  // return next();
-
   let token = req.headers["x-auth-token"];
   if (!token) {
-    let body = req.body.query;
-    // let text =
-      /(user_signup)|(verify_otp)|(resend_otp)|(user_login)|(login_otp)|(reset_forgot_password)/;
-    // let match = body.match(text);
-    // if (!match) {
-    //   logger.error("Auth token is required");
-    //   return res.status(401).json({
-    //     success: false,
-    //     status: 401,
-    //     message: "provide auth token",
-    //   });
-    // }
+    req.is_authorized = false;
     return next();
   }
   let secretOrKey = config.jwtSecret;
@@ -52,8 +39,9 @@ module.exports = (req, res, next) => {
       }
       if (user && user.user_id) {
         req.user = user.user_id;
+        req.is_authorized = true;
+
         // check if verifyid
-        console.log(req.user);
         if (!req.user.is_verified) {
           return res.status(401).json({
             success: false,
@@ -61,6 +49,7 @@ module.exports = (req, res, next) => {
             message: "This account is not verified.",
           });
         }
+        console.log(req.is_authorized);
         return next();
       } else {
         logger.debug("Session not found");

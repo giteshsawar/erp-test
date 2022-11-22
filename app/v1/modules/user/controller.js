@@ -8,7 +8,14 @@ const {
   reset_forgot_password,
   update_user,
 } = require("../../services/user");
+const {
+  create_company,
+  update_company,
+  list_company,
+} = require("../../services/company");
 const User = require("../../services/user/model");
+const { update } = require("../../services/user/session_model");
+const constant = require("../../../../config/constants").response_msgs;
 let controller = Object.create(null);
 
 /* 
@@ -20,49 +27,37 @@ controller.user_signup = async (data, req, res) => {
     return result; //res.status(result.status).json(result);
   } catch (error) {
     logger.error("Error while signup user");
+    logger.error(error.toString());
     throw new Error(`${error.toString()},while signing up user`);
-    // return res.status(400).json({
-    //   success: false,
-    //   status: 400,
-    //   message: error.toString(),
-    // });
   }
 };
 
-controller.verify_otp = async () => {
+controller.verify_otp = async ({ phone_number, otp }) => {
   try {
-    let { phone_number, otp } = req.body;
     const result = await verify_otp(phone_number, otp);
-    return res.status(result.status).json(result);
+    return result;
   } catch (error) {
     logger.error("Error while verify_otp");
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.toString(),
-    });
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while verifying user otp`);
   }
 };
 
-controller.resend_otp = async (req, res) => {
+controller.resend_otp = async ({ phone_number }) => {
   try {
-    let { phone_number } = req.body;
     const result = await resend_otp(phone_number);
-    return res.status(result.status).json(result);
+    return result;
   } catch (error) {
     logger.error("Error while resend_otp");
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.toString(),
-    });
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while resend_otp`);
   }
 };
 
-controller.user_login = async ({ phone_number, password }) => {
+controller.user_login = async ({ phone_number, password }, req) => {
   try {
     //let { phone_number, password } = req.body;
-    console.log(phone_number);
+    console.log("ggggggggg", req.is_authorized);
     const result = await user_login(phone_number, password);
     console.log(result);
     return result;
@@ -73,67 +68,123 @@ controller.user_login = async ({ phone_number, password }) => {
   }
 };
 
-controller.login_otp = async (req, res) => {
+controller.login_otp = async ({ phone_number }) => {
   try {
-    const { phone_number } = req.body;
     const result = await login_otp(phone_number);
-    return res.status(result.status).json(result);
+    return result;
   } catch (error) {
     logger.error("Error while login_otp");
-    logger.error(error.message);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.toString(),
-    });
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while login_otp`);
   }
 };
 
-controller.reset_forgot_password = async (req, res) => {
+controller.user_details = async ({ hello }, req) => {
   try {
-    const { phone_number, otp, password } = req.body;
-    const result = await reset_forgot_password(phone_number, password, otp);
-    return res.status(result.status).json(result);
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user = await User.findOne({ _id: req.user._id });
+    if (!user) {
+      return {
+        success: false,
+        status: 404,
+        message: constant.USER_NOT_FOUND,
+      };
+    }
+    return {
+      success: true,
+      status: 200,
+      message: "success",
+      user: user,
+    };
+  } catch (error) {
+    logger.error("Error while user_details");
+    logger.error(error.message);
+    throw new Error(`${error.toString()},while user_details`);
+  }
+};
+
+controller.reset_forgot_password = async ({
+  phone_number,
+  otp,
+  new_password,
+}) => {
+  try {
+    const result = await reset_forgot_password(phone_number, new_password, otp);
+    return result;
   } catch (error) {
     logger.error("Error while reset_forgot_password");
-    logger.error(error.message);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.toString(),
-    });
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while user reset_forgot_password`);
   }
 };
 
-controller.update_user = async (req, res) => {
+controller.update_user = async (updateUserInput, req) => {
   try {
-    const update = req.body;
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let update = updateUserInput.updateUserInput;
+    console.log(update);
     let user_id = req.user._id;
     const result = await update_user(update, user_id);
-    return res.status(result.status).json(result);
+    return result;
   } catch (error) {
     logger.error("Error while update_user");
-    logger.error(error.message);
-    return res.status(400).json({
-      success: false,
-      status: 400,
-      message: error.toString(),
-    });
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while update_user`);
   }
 };
 
-controller.user_details = async (req) => {
+/*
+  company controllers
+*/
+controller.create_company = async (companyInput, req) => {
   try {
-    console.log(req.user);
-    let userId = req.user._id;
-    let user = await User.findOne({ _id: userId });
-    if (!user) {
-      throw new Error("User not found");
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
     }
-    return user;
+    let data = companyInput.companyInput;
+    data.owner = req.user._id;
+    const result = await create_company(data);
+    return result;
   } catch (error) {
-    logger.error("Error while geting user details");
-    throw new Error(`${error.toString()},while geting user details`);
+    logger.error("Error while create_company");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while create_company`);
+  }
+};
+
+controller.update_company = async ({ companyUpdateInput, company_id }, req) => {
+  try {
+    console.log(req.is_authorized);
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    let result = await update_company(companyUpdateInput, user_id, company_id);
+    return result;
+  } catch (error) {
+    logger.error("Error while update_company");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while update_company`);
   }
 };
 

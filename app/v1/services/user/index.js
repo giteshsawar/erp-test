@@ -41,8 +41,8 @@ const user_signup = async (data) => {
     return {
       success: true,
       status: 200,
-      mesage: "created",
-      //constant.SIGNUP.SUCCESS,
+      message: constant.SIGNUP.SUCCESS,
+      phone_number: new_user.phone_number,
     };
   } catch (error) {
     console.log(error);
@@ -53,7 +53,6 @@ const user_signup = async (data) => {
 
 const verify_otp = async (phone_number, otp) => {
   try {
-    console.log(phone_number, otp);
     let user = await User.findOne({ phone_number: phone_number });
     if (!user) {
       return {
@@ -62,7 +61,6 @@ const verify_otp = async (phone_number, otp) => {
         message: constant.USER_NOT_FOUND,
       };
     }
-    console.log("helloooo");
     if (user.phone_otp.expire_at < Date.now()) {
       return {
         success: false,
@@ -87,7 +85,7 @@ const verify_otp = async (phone_number, otp) => {
       success: true,
       status: 200,
       auth_token: token,
-      mesage: constant.VERIFY_OTP.SUCCESS,
+      message: constant.VERIFY_OTP.SUCCESS,
       user: user,
     };
   } catch (error) {
@@ -117,7 +115,7 @@ const resend_otp = async (phone_number) => {
       message: constant.VERIFY_OTP.RESEND_OTP,
     };
   } catch (error) {
-    logger.error(error.message);
+    logger.error(error.toString());
     throw error;
   }
 };
@@ -129,7 +127,7 @@ const user_login = async (phone_number, password) => {
       return {
         success: false,
         status: 404,
-        mesage: constant.USER_NOT_FOUND,
+        message: constant.USER_NOT_FOUND,
       };
     }
     if (user.valid_password(password)) {
@@ -145,7 +143,7 @@ const user_login = async (phone_number, password) => {
     return {
       success: false,
       status: 400,
-      mesage: constant.LOGIN.WORNG_PASSWORD,
+      message: constant.LOGIN.WORNG_PASSWORD,
     };
   } catch (error) {
     logger.error(error.message);
@@ -164,11 +162,10 @@ const login_otp = async (phone_number) => {
       };
     }
     if (!user.is_verified) {
-      console.log(user);
       return {
         success: false,
         status: 400,
-        mesage: constant.LOGIN.NOT_VERIFYIED,
+        message: constant.LOGIN.NOT_VERIFYIED,
       };
     }
     user.phone_otp.otp = Math.floor(100000 + Math.random() * 900000);
@@ -224,10 +221,10 @@ const reset_forgot_password = async (phone_number, password, otp) => {
     return {
       success: true,
       status: 200,
-      mesage: constant.LOGIN.RESET_FORGOT_PASSWORD,
+      message: constant.LOGIN.RESET_FORGOT_PASSWORD,
     };
   } catch (error) {
-    logger.error(error.message);
+    logger.error(error.toString());
     throw error;
   }
 };
