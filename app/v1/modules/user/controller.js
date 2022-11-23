@@ -12,7 +12,14 @@ const {
   create_company,
   update_company,
   list_company,
+  remove_company,
 } = require("../../services/company");
+const {
+  create_warehouse,
+  update_warehouse_details,
+  list_warehouse,
+  remove_warehouse,
+} = require("../../services/warehouse");
 const User = require("../../services/user/model");
 const { update } = require("../../services/user/session_model");
 const constant = require("../../../../config/constants").response_msgs;
@@ -185,6 +192,130 @@ controller.update_company = async ({ companyUpdateInput, company_id }, req) => {
     logger.error("Error while update_company");
     logger.error(error.toString());
     throw new Error(`${error.toString()},while update_company`);
+  }
+};
+
+controller.list_company = async ({ companyQuery }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    companyQuery.user_id = req.user._id;
+    const result = await list_company(companyQuery);
+    return result;
+  } catch (error) {
+    logger.error("Error while list_company");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while list_company`);
+  }
+};
+
+controller.remove_company = async ({ company_id }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    const result = await remove_company(user_id, company_id);
+    return result;
+  } catch (error) {
+    logger.error("Error while remove_company");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while remove_company`);
+  }
+};
+
+/* 
+ warehouse controllers.
+*/
+controller.create_warehouse = async ({ warehouseInput }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    warehouseInput.owner = req.user._id;
+    const result = await create_warehouse(warehouseInput);
+    return result;
+  } catch (error) {
+    logger.error("Error while create_warehouse");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while create_warehouse`);
+  }
+};
+
+controller.update_warehouse_details = async (
+  { warehouseUpdateInput, warehouse_id },
+  req
+) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    const result = await update_warehouse_details(
+      warehouseUpdateInput,
+      user_id,
+      warehouse_id
+    );
+    return result;
+  } catch (error) {
+    logger.error("Error while update_warehouse_details");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while update_warehouse_details`);
+  }
+};
+
+controller.list_warehouse = async ({ warehouseQuery }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    warehouseQuery.owner = req.user._id;
+    const result = await list_warehouse(warehouseQuery);
+    return result;
+  } catch (error) {
+    logger.error("Error while list_warehouse");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while list_warehouse`);
+  }
+};
+
+controller.remove_warehouse = async ({ warehouse_id }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    const result = await remove_warehouse(user_id, warehouse_id);
+    return result;
+  } catch (error) {
+    logger.error("Error while remove_warehouse");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while remove_warehouse`);
   }
 };
 

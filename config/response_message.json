@@ -2,6 +2,7 @@
   "USER_NOT_FOUND": "User not found",
   "INVALID_OBJECTID": "Invalid mongo ID",
   "INVALID_TOKEN": "Invalid or expired token",
+  "SUCCESS": "Success",
   "SIGNUP": {
     "ALREADY_EXISTS": "Account with this phone number is already exist",
     "NOT_VERIFYIED": "Your number is already registered.Please verify with otp sent to your phone.",
@@ -27,6 +28,15 @@
     "CREATED": "Company created.",
     "NOT_FOUND": "Company not found",
     "UPDATE": "Update successfully",
-    "NO_RECORD": "No record found"
+    "NO_RECORD": "No record found",
+    "DELETED": "Deleted successful"
+  },
+  "WAREHOUSE": {
+    "CREATED": "Warehouse created.",
+    "NOT_FOUND": "Warehouse not found",
+    "UPDATE": "Update successfully",
+    "NO_RECORD": "No record found",
+    "DELETED": "Deleted successful",
+    "COMPANY_NOT_FOUND": "Company not found with given id "
   }
 }

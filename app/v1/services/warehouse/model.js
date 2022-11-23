@@ -11,6 +11,7 @@ const warehouseSchema = new mongoose.Schema(
     },
     location: { type: String },
     company_id: { type: mongoose.Types.ObjectId },
+    owner: { type: mongoose.Types.ObjectId },
     is_active: { type: Boolean, default: false },
   },
   {

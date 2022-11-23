@@ -1,6 +1,6 @@
 require("app-module-path").addPath(__dirname);
 const express = require("express"),
-  config = require("./config/");
+  config = require("./config");
 const { errors } = require("celebrate"),
   mongoose = require("mongoose"),
   env = require("./config/env"),

@@ -1,50 +1,33 @@
-const logger = require("../../../../config/logger");
-const { findOneAndRemove } = require("./model");
-const Company = require("./model");
+"use strict";
+const Warehouse = require("./model");
 const constant = require("../../../../config/constants").response_msgs;
+const logger = require("../../../../config/logger");
+const Company = require("../company/model");
 const ObjectId = require("mongoose").Types.ObjectId;
 
-const create_company = async (data) => {
+const create_warehouse = async (data) => {
   try {
-    let new_company = await Company.create(data);
-    return {
-      success: true,
-      status: 200,
-      message: constant.COMPANY.CREATED,
-      company: new_company,
-    };
-  } catch (error) {
-    logger.error(error.toString());
-    throw error;
-  }
-};
-
-const update_company = async (update, user_id, company_id) => {
-  try {
-    if (!ObjectId.isValid(company_id)) {
+    if (!ObjectId.isValid(data.company_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    let company = await Company.findOne({ owner: user_id, _id: company_id });
+    let company = await Company.findOne({ _id: data.company_id });
     if (!company) {
       return {
         success: false,
         status: 404,
-        message: constant.COMPANY.NOT_FOUND,
+        message: constant.WAREHOUSE.COMPANY_NOT_FOUND,
       };
     }
-    await Company.findOneAndUpdate(
-      { _id: company_id, owner: user_id },
-      update,
-      { new: true }
-    );
+    let new_warehouse = await Warehouse.create(data);
     return {
       success: true,
       status: 200,
-      message: constant.COMPANY.UPDATE,
+      message: constant.WAREHOUSE.CREATED,
+      warehouse: new_warehouse,
     };
   } catch (error) {
     logger.error(error.toString());
@@ -52,7 +35,43 @@ const update_company = async (update, user_id, company_id) => {
   }
 };
 
-const list_company = async (query) => {
+const update_warehouse_details = async (update, user_id, warehouse_id) => {
+  try {
+    if (!ObjectId.isValid(warehouse_id)) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.INVALID_OBJECTID,
+      };
+    }
+    let warehouse = await Warehouse.findOne({
+      owner: user_id,
+      _id: warehouse_id,
+    });
+    if (!warehouse) {
+      return {
+        success: false,
+        status: 404,
+        message: constant.WAREHOUSE.NOT_FOUND,
+      };
+    }
+    await Warehouse.findOneAndUpdate(
+      { _id: warehouse_id, owner: user_id },
+      update,
+      { new: true }
+    );
+    return {
+      success: true,
+      status: 200,
+      message: constant.WAREHOUSE.UPDATE,
+    };
+  } catch (error) {
+    logger.error(error.toString());
+    throw error;
+  }
+};
+
+const list_warehouse = async (query) => {
   try {
     const page = query.page ? parseInt(query.page) : 1;
     const limit = query.limit ? parseInt(query.limit) : 10;
@@ -78,11 +97,15 @@ const list_company = async (query) => {
     if (query.name) {
       params["name"] = new RegExp(`${query.name}`, "i");
     }
-    if (query.phone_number) {
-      params["phone_number"] = query.phone_number;
-    }
-    if (query.email) {
-      params["email"] = new RegExp(`${query.email}`, "i");
+    if (query.company_id) {
+      if (!ObjectId.isValid(query.company_id)) {
+        return {
+          success: false,
+          status: 400,
+          message: constant.INVALID_OBJECTID,
+        };
+      }
+      params["company_id"] = query.company_id;
     }
     if (query.city) {
       params["address.city"] = new RegExp(`${query.city}`, "i");
@@ -96,22 +119,19 @@ const list_company = async (query) => {
     if (query.is_active) {
       params["is_active"] = query.is_active;
     }
-    if (query.industry_type) {
-      params["industry_type"] = query.industry_type;
-    }
 
-    const totalRecord = await Company.countDocuments(params);
-    const company_data = await Company.find(params)
+    const totalRecord = await Warehouse.countDocuments(params);
+    const warehouse_data = await Warehouse.find(params)
       .sort(sortOptions)
       .skip((page - 1) * limit)
       .limit(limit);
-    if (company_data.length) {
+    if (warehouse_data.length) {
       return {
         success: true,
         status: 200,
         message: constant.SUCCESS,
         totalRecord: totalRecord,
-        data: company_data,
+        data: warehouse_data,
         next_page: totalRecord > page * limit ? true : false,
       };
     } else {
@@ -119,7 +139,7 @@ const list_company = async (query) => {
         success: true,
         status: 200,
         totalRecord: totalRecord,
-        message: constant.COMPANY.NO_RECORD,
+        message: constant.WAREHOUSE.NO_RECORD,
       };
     }
   } catch (error) {
@@ -128,28 +148,31 @@ const list_company = async (query) => {
   }
 };
 
-const remove_company = async (user_id, company_id) => {
+const remove_warehouse = async (user_id, warehouse_id) => {
   try {
-    if (!ObjectId.isValid(company_id)) {
+    if (!ObjectId.isValid(warehouse_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    const company = await Company.findOne({ owner: user_id, _id: company_id });
-    if (!company) {
+    const warehouse = await Warehouse.findOne({
+      owner: user_id,
+      _id: warehouse_id,
+    });
+    if (!warehouse) {
       return {
         success: false,
         status: 404,
         message: constant.COMPANY.NOT_FOUND,
       };
     }
-    await Company.findOneAndRemove({ _id: company_id });
+    await Warehouse.findOneAndRemove({ _id: warehouse_id });
     return {
       success: true,
       status: 200,
-      message: constant.COMPANY.DELETED,
+      message: constant.WAREHOUSE.DELETED,
     };
   } catch (error) {
     logger.error(error.toString());
@@ -158,8 +181,8 @@ const remove_company = async (user_id, company_id) => {
 };
 
 module.exports = {
-  create_company,
-  update_company,
-  list_company,
-  remove_company,
+  create_warehouse,
+  update_warehouse_details,
+  list_warehouse,
+  remove_warehouse,
 };

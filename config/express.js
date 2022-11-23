@@ -1,12 +1,11 @@
-const express = require("express");
 const morgan = require("morgan");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const { graphqlHTTP } = require("express-graphql");
-//const { buildSchema } = require("graphql");
+const rateLimiter = require("express-rate-limit");
 
 const controller = require("../app/v1/modules/user/controller");
-const graphqlSchema = require("../app/v1/modules/user/graphql_schema");
+const graphqlSchema = require("../app/v1/modules/user/graphql_schema.graphql");
 
 const logger = require("./logger");
 
@@ -23,11 +22,12 @@ module.exports = function (app, config) {
   app.use(bodyParser.json({ limit: "50mb" }));
   app.use(bodyParser.urlencoded({ extended: true, limit: "50mb" }));
   app.use(cookieParser());
-  //app.use(express.static(`${config.root}/web/public`));
-  //console.log(userModel());
+
+  //routes
+  app.use(rateLimiter(config.rateLimiter));
   app.use(require("../app/v1/modules/user/auth/authentication"));
   app.use(
-    "/graphql",
+    `/api/${config.app.webApi}/deadend`,
     graphqlHTTP({
       schema: graphqlSchema,
       rootValue: controller,
