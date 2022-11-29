@@ -38,5 +38,29 @@
     "NO_RECORD": "No record found",
     "DELETED": "Deleted successful",
     "COMPANY_NOT_FOUND": "Company not found with given id "
+  },
+  "ITEAM_CATEGORY": {
+    "CREATED": " new Category created.",
+    "NOT_FOUND": "Category not found",
+    "UPDATE": "Update successfully",
+    "NO_RECORD": "No record found",
+    "DELETED": "Deleted successful",
+    "COMPANY_NOT_FOUND": "Company not found with given id "
+  },
+  "ITEAM_VARIANT": {
+    "CREATED": " new Category created.",
+    "NOT_FOUND": "Category not found",
+    "UPDATE": "Update successfully",
+    "NO_RECORD": "No record found",
+    "DELETED": "Deleted successful",
+    "WAREHOUSE_NOT_FOUND": "Warehouse not found with given id "
+  },
+  "ITEAM": {
+    "ADDED": " new iteam add.",
+    "NOT_FOUND": "Category not found",
+    "UPDATE": "Update successfully",
+    "NO_RECORD": "No record found",
+    "DELETED": "Deleted successful",
+    "ITEAM_CATEGORY": "Company not found with given id "
   }
 }

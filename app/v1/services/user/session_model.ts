@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const logger = require("../../../../config/logger");
 
 let sessionSchema = new mongoose.Schema({

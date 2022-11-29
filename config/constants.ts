@@ -3,6 +3,7 @@ const env = require("./env"),
 
 var constantObj = {
   response_msgs: response_msgs,
+  baseUrl: "",
 };
 
 switch (env) {

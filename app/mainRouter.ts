@@ -1,7 +1,7 @@
 const express = require("express"),
   glob = require("glob");
 const swaggerUi = require("swagger-ui-express");
-const config = require("../config");
+import config from "../config";
 const constants = require("../config/constants");
 const env = require("../config/env");
 let router = express.Router();

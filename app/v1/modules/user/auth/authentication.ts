@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const config = require("../../../../../config");
+import config from "../../../../../config";
 const Session = require("../../../services/user/session_model");
 const logger = require("../../../../../config/logger");
 const ObjectId = require("mongoose").Types.ObjectId;

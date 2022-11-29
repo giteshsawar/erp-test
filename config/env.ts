@@ -4,4 +4,4 @@ if (!env) {
   env = "development";
 }
 
-module.exports = env;
+export = env;

@@ -5,11 +5,11 @@ const { graphqlHTTP } = require("express-graphql");
 const rateLimiter = require("express-rate-limit");
 
 const controller = require("../app/v1/modules/user/controller");
-const graphqlSchema = require("../app/v1/modules/user/graphql_schema.graphql");
+const graphqlSchema = require("../app/v1/modules/user/graphql_schema");
 
-const logger = require("./logger");
+import logger from "./logger";
 
-module.exports = function (app, config) {
+module.exports = function (app: any, config: any) {
   // set up environment for the application
   let env = require("./env");
   app.locals.ENV = env;

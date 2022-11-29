@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const bcrypt = require("bcrypt");
 const config = require("../../../../config");
 const Session = require("./session_model");

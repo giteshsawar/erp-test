@@ -2,7 +2,8 @@ const logger = require("../../../../config/logger");
 const { findOneAndRemove } = require("./model");
 const Company = require("./model");
 const constant = require("../../../../config/constants").response_msgs;
-const ObjectId = require("mongoose").Types.ObjectId;
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
 const create_company = async (data) => {
   try {
@@ -13,7 +14,7 @@ const create_company = async (data) => {
       message: constant.COMPANY.CREATED,
       company: new_company,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
@@ -46,7 +47,7 @@ const update_company = async (update, user_id, company_id) => {
       status: 200,
       message: constant.COMPANY.UPDATE,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
@@ -57,7 +58,7 @@ const list_company = async (query) => {
     const page = query.page ? parseInt(query.page) : 1;
     const limit = query.limit ? parseInt(query.limit) : 10;
     const sortBy = query.sortBy || "createdAt";
-    const sortOrder = query.sortOrder ? parseInt(sortOrder) : -1;
+    const sortOrder = query.sortOrder ? parseInt(query.sortOrder) : -1;
 
     const sortOptions = {
       [sortBy]: sortOrder,
@@ -122,7 +123,7 @@ const list_company = async (query) => {
         message: constant.COMPANY.NO_RECORD,
       };
     }
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
@@ -151,7 +152,7 @@ const remove_company = async (user_id, company_id) => {
       status: 200,
       message: constant.COMPANY.DELETED,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }

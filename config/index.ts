@@ -1,6 +1,6 @@
 const path = require("path");
-let rootPath = path.normalize(`${__dirname}/..`),
-  env = require("./env");
+let rootPath = path.normalize(`${__dirname}/..`);
+import env from "./env";
 
 const config = {
   root: rootPath,
@@ -22,4 +22,5 @@ const config = {
   },
 };
 
-module.exports = config[env];
+//module.exports = config[`${env}`];
+export = config[`${env}`];

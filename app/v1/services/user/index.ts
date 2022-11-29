@@ -2,11 +2,13 @@ const User = require("./model");
 const constant = require("../../../../config/constants").response_msgs;
 const Presets = require("../../../../utils/presets");
 const logger = require("../../../../config/logger");
-const ObjectId = require("mongoose").Types.ObjectId;
+import { User, UserSignup } from "../../../../interface";
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
-const user_signup = async (data) => {
+const user_signup = async (data: UserSignup) => {
   try {
-    let exist = await User.findOne({ phone_number: data.phone_number });
+    let exist: User = await User.findOne({ phone_number: data.phone_number });
     if (exist) {
       if (exist.is_verified) {
         return {
@@ -16,7 +18,7 @@ const user_signup = async (data) => {
         };
       }
       const otp = Math.floor(100000 + Math.random() * 900000);
-      exist.phone_otp.otp = otp;
+      exist.phone_otp.otp = otp.toString();
       exist.phone_otp.expire_at = Date.now() + Presets.otp_expiry_time;
       await exist.save();
       //FIXME: setup sms sender to phone number.To send otp.
@@ -44,16 +46,16 @@ const user_signup = async (data) => {
       message: constant.SIGNUP.SUCCESS,
       phone_number: new_user.phone_number,
     };
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
     logger.error(error.toString());
     throw error;
   }
 };
 
-const verify_otp = async (phone_number, otp) => {
+const verify_otp = async (phone_number: String, otp: String) => {
   try {
-    let user = await User.findOne({ phone_number: phone_number });
+    let user: User = await User.findOne({ phone_number: phone_number });
     if (!user) {
       return {
         success: false,
@@ -80,7 +82,6 @@ const verify_otp = async (phone_number, otp) => {
     user.is_verified = true;
     await user.save();
     const token = await user.gen_auth_token();
-    delete user.password;
     return {
       success: true,
       status: 200,
@@ -88,13 +89,13 @@ const verify_otp = async (phone_number, otp) => {
       message: constant.VERIFY_OTP.SUCCESS,
       user: user,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
 };
 
-const resend_otp = async (phone_number) => {
+const resend_otp = async (phone_number: String) => {
   try {
     let user = await User.findOne({ phone_number: phone_number });
     if (!user) {
@@ -114,13 +115,13 @@ const resend_otp = async (phone_number) => {
       status: 200,
       message: constant.VERIFY_OTP.RESEND_OTP,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
 };
 
-const user_login = async (phone_number, password) => {
+const user_login = async (phone_number: String, password: String) => {
   try {
     let user = await User.findOne({ phone_number: phone_number });
     if (!user) {
@@ -145,13 +146,13 @@ const user_login = async (phone_number, password) => {
       status: 400,
       message: constant.LOGIN.WORNG_PASSWORD,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.message);
     throw error;
   }
 };
 
-const login_otp = async (phone_number) => {
+const login_otp = async (phone_number: String) => {
   try {
     let user = await User.findOne({ phone_number: phone_number });
     if (!user) {
@@ -177,13 +178,17 @@ const login_otp = async (phone_number) => {
       status: 200,
       message: constant.LOGIN.OTP_SENT,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.mesage);
     throw error;
   }
 };
 
-const reset_forgot_password = async (phone_number, password, otp) => {
+const reset_forgot_password = async (
+  phone_number: String,
+  password: String,
+  otp: String
+) => {
   try {
     let user = await User.findOne({ phone_number: phone_number });
     if (!user) {
@@ -223,7 +228,7 @@ const reset_forgot_password = async (phone_number, password, otp) => {
       status: 200,
       message: constant.LOGIN.RESET_FORGOT_PASSWORD,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
@@ -252,7 +257,7 @@ const update_user = async (update, user_id) => {
       status: 200,
       message: constant.USER.UPDATE,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.message);
     throw error;
   }

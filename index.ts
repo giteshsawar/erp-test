@@ -3,12 +3,12 @@ const express = require("express"),
   config = require("./config");
 const { errors } = require("celebrate"),
   mongoose = require("mongoose"),
-  env = require("./config/env"),
   cors = require("cors"),
   expressSanitizer = require("express-sanitizer");
+import env from "./config/env";
 const app = express();
 const http = require("http").Server(app);
-const logger = require("./config/logger.js");
+const logger = require("./config/logger");
 
 app.use(cors());
 app.options("*", cors());
@@ -29,7 +29,7 @@ mongoose.connect(
     }
   }
 );
-
+const db = mongoose.connection;
 http.listen(config.port, () => {
   logger.info(
     `Express server listening on port ${config.port}\nOn env : ${env}`
@@ -40,7 +40,7 @@ require("./config/express")(app, config);
 
 app.use((req, res, next) => {
   const err = new Error(`${req.path} --	 Path Not Found`);
-  err.status = 404;
+  //err.status = 404;
   next(err);
 });
 

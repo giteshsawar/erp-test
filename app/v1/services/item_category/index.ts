@@ -1,11 +1,15 @@
-"use strict";
-const Warehouse = require("./model");
+/*
+    @author:Kishan
+*/
+
+const ItemCategory = require("./model");
 const constant = require("../../../../config/constants").response_msgs;
 const logger = require("../../../../config/logger");
 const Company = require("../company/model");
-const ObjectId = require("mongoose").Types.ObjectId;
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
-const create_warehouse = async (data) => {
+const create_category = async (data) => {
   try {
     if (!ObjectId.isValid(data.company_id)) {
       return {
@@ -22,31 +26,32 @@ const create_warehouse = async (data) => {
         message: constant.WAREHOUSE.COMPANY_NOT_FOUND,
       };
     }
-    let new_warehouse = await Warehouse.create(data);
+    let new_category = await ItemCategory.create(data);
+
     return {
       success: true,
       status: 200,
-      message: constant.WAREHOUSE.CREATED,
-      warehouse: new_warehouse,
+      message: constant.ITEAM_CATEGORY.CREATED,
+      warehouse: new_category,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
 };
 
-const update_warehouse_details = async (update, user_id, warehouse_id) => {
+const update_category_details = async (update, user_id, category_id) => {
   try {
-    if (!ObjectId.isValid(warehouse_id)) {
+    if (!ObjectId.isValid(category_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    let warehouse = await Warehouse.findOne({
+    let warehouse = await ItemCategory.findOne({
       owner: user_id,
-      _id: warehouse_id,
+      _id: category_id,
     });
     if (!warehouse) {
       return {
@@ -55,28 +60,28 @@ const update_warehouse_details = async (update, user_id, warehouse_id) => {
         message: constant.WAREHOUSE.NOT_FOUND,
       };
     }
-    await Warehouse.findOneAndUpdate(
-      { _id: warehouse_id, owner: user_id },
+    await ItemCategory.findOneAndUpdate(
+      { _id: category_id, owner: user_id },
       update,
       { new: true }
     );
     return {
       success: true,
       status: 200,
-      message: constant.WAREHOUSE.UPDATE,
+      message: constant.ITEAM_CATEGORY.UPDATE,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
 };
 
-const list_warehouse = async (query) => {
+const list_category = async (query) => {
   try {
     const page = query.page ? parseInt(query.page) : 1;
     const limit = query.limit ? parseInt(query.limit) : 10;
     const sortBy = query.sortBy || "createdAt";
-    const sortOrder = query.sortOrder ? parseInt(sortOrder) : -1;
+    const sortOrder = query.sortOrder ? parseInt(query.sortOrder) : -1;
 
     const sortOptions = {
       [sortBy]: sortOrder,
@@ -107,31 +112,28 @@ const list_warehouse = async (query) => {
       }
       params["company_id"] = query.company_id;
     }
-    if (query.city) {
-      params["address.city"] = new RegExp(`${query.city}`, "i");
-    }
-    if (query.state) {
-      params["address.state"] = new RegExp(`${query.state}`, "i");
-    }
     if (query.user_id) {
       params["owner"] = query.user_id;
     }
     if (query.is_active) {
       params["is_active"] = query.is_active;
     }
+    if (query.type) {
+      params["type"] = query.type;
+    }
 
-    const totalRecord = await Warehouse.countDocuments(params);
-    const warehouse_data = await Warehouse.find(params)
+    const totalRecord = await ItemCategory.countDocuments(params);
+    const category_data = await ItemCategory.find(params)
       .sort(sortOptions)
       .skip((page - 1) * limit)
       .limit(limit);
-    if (warehouse_data.length) {
+    if (category_data.length) {
       return {
         success: true,
         status: 200,
         message: constant.SUCCESS,
         totalRecord: totalRecord,
-        data: warehouse_data,
+        data: category_data,
         next_page: totalRecord > page * limit ? true : false,
       };
     } else {
@@ -139,50 +141,50 @@ const list_warehouse = async (query) => {
         success: true,
         status: 200,
         totalRecord: totalRecord,
-        message: constant.WAREHOUSE.NO_RECORD,
+        message: constant.ITEAM_CATEGORY.NO_RECORD,
       };
     }
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
 };
 
-const remove_warehouse = async (user_id, warehouse_id) => {
+const remove_category = async (user_id, category_id) => {
   try {
-    if (!ObjectId.isValid(warehouse_id)) {
+    if (!ObjectId.isValid(category_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    const warehouse = await Warehouse.findOne({
+    const warehouse = await ItemCategory.findOne({
       owner: user_id,
-      _id: warehouse_id,
+      _id: category_id,
     });
     if (!warehouse) {
       return {
         success: false,
         status: 404,
-        message: constant.COMPANY.NOT_FOUND,
+        message: constant.ITEAM_CATEGORY.NOT_FOUND,
       };
     }
-    await Warehouse.findOneAndRemove({ _id: warehouse_id });
+    await ItemCategory.findOneAndRemove({ _id: category_id });
     return {
       success: true,
       status: 200,
-      message: constant.WAREHOUSE.DELETED,
+      message: constant.ITEAM_CATEGORY.DELETED,
     };
-  } catch (error) {
+  } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
 };
 
 module.exports = {
-  create_warehouse,
-  update_warehouse_details,
-  list_warehouse,
-  remove_warehouse,
+  create_category,
+  update_category_details,
+  list_category,
+  remove_category,
 };

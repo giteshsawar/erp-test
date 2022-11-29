@@ -6,7 +6,6 @@ const celebrate = require("celebrate").celebrate;
 const request_validation = require("../../services/validation");
 const authentication = require("./auth/authentication");
 const { graphqlHTTP } = require("express-graphql");
-const { buildSchema } = require("graphql");
 
 module.exports = (router) => {
   /*

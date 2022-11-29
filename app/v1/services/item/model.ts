@@ -1,16 +1,17 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const itemSchema = new mongoose.Schema(
   {
     name: { type: String, trim: true, required: true },
     category_id: { type: mongoose.Types.ObjectId },
-    SKU_id: {}, //FIXME:dought.
-    tax_category_id: { type: mongoose.Types.ObjectId }, //FIXME:
+    SKU_id: { type: Array, trim: true },
+    tax_category_id: { type: String },
     cover_image: { type: String },
-    HSN_code_id: { type: mongoose.Types.ObjectId }, //FIXME:
-    variant_id: { type: mongoose.Types.ObjectId },
+    HSN_code_id: { type: String },
+    variant_id: [{ type: mongoose.Types.ObjectId }],
     description: { type: String, trim: true },
     company_id: { type: mongoose.Types.ObjectId },
+    owner: { type: mongoose.Types.ObjectId },
     is_active: { type: Boolean, defult: true },
   },
   {
@@ -19,4 +20,4 @@ const itemSchema = new mongoose.Schema(
 );
 
 const Item = mongoose.model("Item", itemSchema, "Item");
-module.exports = Item;
+export = Item;

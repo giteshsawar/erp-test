@@ -105,6 +105,16 @@ module.exports = buildSchema(`
         warehouse:Warehouse
     }
 
+    #/******warehouse list*******/
+    type ListWarehouse {
+        success:String!
+        status:Int!
+        totalRecord:Int!
+        message:String
+        data: [Warehouse!]
+        next_page:Boolean
+    }
+
 #/************all inpute type***********/
 
   #/******all user inputs*******/
@@ -188,7 +198,19 @@ module.exports = buildSchema(`
         locatioin:String
         is_active:Boolean
     }
-
+    
+    #/*******warehouse list query********/
+    input warehouseQuery {
+        _id:String
+        name:String
+        company_id:String
+        city:String
+        state:String
+        is_active:String
+        page:String
+        limit:String
+        sortBy:String
+    }
     
 #/**************All querys.************/
     type RootQuery {
@@ -298,6 +320,52 @@ module.exports = buildSchema(`
                 #success:true, status:200, message: success,
         remove_company(company_id:String!):commanResponce
 
+        #/******description:List of company's warehouse.
+            #parameters:
+                #name: name
+                    #description: warehouse's name.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: city
+                    #description: warehouse's  city.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: state
+                    #description: warehouse's  state.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: company_id
+                    #description: company's id.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: is_active
+                    #description: warehouse's active status.
+                    #in: body
+                    #required: false
+                    #type: booolean
+                #name:_id
+                    #description: warehouse's id.
+                    #in: body
+                    #required: false
+                    #type: string
+            #responce:
+                #success:true, status:200, totalRecord:numberOfRecord, data: warehouse list,next_page:true/false
+        list_warehouse(warehouseQuery:warehouseQuery):ListWarehouse
+
+        #/******description:remove warehouse.*******/
+            #parameters:
+                #name: warehouse_id
+                    #description: company's warehouse id.
+                    #in: body
+                    #required: true
+                    #type: string
+            #responce:
+                #success:true, status:200, message: success,
+        remove_warehouse(warehouse_id:String!):commanResponce
     }
 
 #All Mutations

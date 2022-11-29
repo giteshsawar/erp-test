@@ -3,7 +3,7 @@ require("winston-daily-rotate-file");
 const winston = require("winston");
 const fs = require("fs");
 
-const env = require("./env");
+import env from "./env";
 
 const logDir = "log";
 
@@ -53,4 +53,4 @@ logger.stream = {
   },
 };
 
-module.exports = logger;
+export = logger;
