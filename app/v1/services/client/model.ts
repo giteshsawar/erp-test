@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const clintSchema = new mongoose.Schema(
+const clientSchema = new mongoose.Schema(
   {
     type: { type: String },
     name: { type: String, trim: true, required: true },
@@ -23,7 +23,13 @@ const clintSchema = new mongoose.Schema(
     max_balance: { type: String }, //FIXME:confirm data type.
     number_of_sale: { type: String, trim: true },
     number_of_purchase: { type: String, trim: true },
-    contacts: [{ type: String }], //FIXME: confirm data type.
+    contacts: [
+      {
+        name: { type: String },
+        phone: { type: String },
+        email: { type: String },
+      },
+    ], //FIXME: confirm data type.
     company_id: { type: mongoose.Types.ObjectId },
     is_active: { type: Boolean, default: true },
   },
@@ -32,5 +38,5 @@ const clintSchema = new mongoose.Schema(
   }
 );
 
-const Clint = mongoose.model("Clint", clintSchema, "Clint");
-module.exports = Clint;
+const Client = mongoose.model("Client", clientSchema, "Client");
+module.exports = Client;

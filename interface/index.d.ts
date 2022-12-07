@@ -70,3 +70,99 @@ export interface ItemVariant {
   expiry_range: string;
   is_active: Boolean;
 }
+
+/**
+ * item category
+ */
+export interface ItemCategory {
+  type: string;
+  name: string;
+  specification: string;
+  description: string;
+  units: string;
+  company_id: string;
+  owner: string;
+  is_active: Boolean;
+}
+
+/**
+ * employee role
+ */
+export interface EmployeeRole {
+  name: string;
+  is_active: Boolean;
+  priveleges: {
+    inventory: {
+      view: Boolean;
+      create: Boolean;
+      delete: Boolean;
+    };
+    orders: {
+      view: Boolean;
+      create: Boolean;
+      delete: Boolean;
+    };
+    employees: {
+      view: Boolean;
+      create: Boolean;
+      delete: Boolean;
+    };
+    clients: {
+      view: Boolean;
+      create: Boolean;
+      delete: Boolean;
+    };
+    invoice: {
+      view: Boolean;
+      create: Boolean;
+      delete: Boolean;
+    };
+  };
+  company_id: string;
+}
+
+/**
+ * client
+ */
+export interface Client {
+  type: string;
+  name: string;
+  phone: string;
+  email: string;
+  address: {
+    billing_address: {
+      address: string;
+      zip_code: string;
+      state: string;
+      city: string;
+    };
+    shipping_address: {
+      address: string;
+      zip_code: string;
+      state: string;
+      city: string;
+    };
+  };
+  max_balance: string;
+  number_of_sale: string;
+  number_of_purchase: string;
+  contacts: [
+    {
+      name: string;
+      phone: string;
+      email: string;
+    }
+  ];
+  company_id: string;
+  is_active: Boolean;
+}
+
+/**
+ * designation
+ */
+export interface Designation {
+  name: string;
+  level: string;
+  company_id: string;
+  is_active: Boolean;
+}

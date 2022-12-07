@@ -1,20 +1,38 @@
-const logger = require("../../../../config/logger");
-const { findOneAndRemove } = require("./model");
-const Company = require("./model");
+const Role = require("./model");
 const constant = require("../../../../config/constants").response_msgs;
+const logger = require("../../../../config/logger");
+import { EmployeeRole } from "../../../../interface";
+const Company = require("../company/model");
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
 
-const create_company = async (data) => {
+const create_role = async (data: EmployeeRole) => {
   try {
-    //FIXME: Create a empoly with role admin.
-    //FIXME: Create role as admin.
-    let new_company = await Company.create(data);
+    let exist = await Role.findOne({
+      name: data.name,
+      company_id: data.company_id,
+    });
+    if (exist) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.ROLE.EXIST,
+      };
+    }
+    let company = await Company.findOne({ _id: data.company_id });
+    if (!company) {
+      return {
+        success: false,
+        status: 404,
+        message: constant.ROLE.COMPANY_NOT_FOUND,
+      };
+    }
+    let new_role = await Role.create(data);
     return {
       success: true,
       status: 200,
-      message: constant.COMPANY.CREATED,
-      company: new_company,
+      message: constant.ROLE.SUCCESS,
+      role: new_role,
     };
   } catch (error: any) {
     logger.error(error.toString());
@@ -22,32 +40,28 @@ const create_company = async (data) => {
   }
 };
 
-const update_company = async (update, user_id, company_id) => {
+const update_role = async (update: EmployeeRole, role_id: string) => {
   try {
-    if (!ObjectId.isValid(company_id)) {
+    if (!ObjectId.isValid(role_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    let company = await Company.findOne({ owner: user_id, _id: company_id });
-    if (!company) {
+    let role = await Role.findOne({ _id: role_id });
+    if (!role) {
       return {
         success: false,
         status: 404,
-        message: constant.COMPANY.NOT_FOUND,
+        mesage: constant.ROLE.NOT_FOUND,
       };
     }
-    await Company.findOneAndUpdate(
-      { _id: company_id, owner: user_id },
-      update,
-      { new: true }
-    );
+    await Role.findOneAndUpdate({ _id: role_id }, update, { new: true });
     return {
       success: true,
       status: 200,
-      message: constant.COMPANY.UPDATE,
+      message: constant.ROLE.UPDATE,
     };
   } catch (error: any) {
     logger.error(error.toString());
@@ -55,7 +69,7 @@ const update_company = async (update, user_id, company_id) => {
   }
 };
 
-const list_company = async (query) => {
+const list_roles = async (query: any) => {
   try {
     const page = query.page ? parseInt(query.page) : 1;
     const limit = query.limit ? parseInt(query.limit) : 10;
@@ -67,7 +81,6 @@ const list_company = async (query) => {
     };
 
     let params = Object.create(null);
-
     if (query._id) {
       if (!ObjectId.isValid(query._id)) {
         return {
@@ -81,40 +94,31 @@ const list_company = async (query) => {
     if (query.name) {
       params["name"] = new RegExp(`${query.name}`, "i");
     }
-    if (query.phone_number) {
-      params["phone_number"] = query.phone_number;
-    }
-    if (query.email) {
-      params["email"] = new RegExp(`${query.email}`, "i");
-    }
-    if (query.city) {
-      params["address.city"] = new RegExp(`${query.city}`, "i");
-    }
-    if (query.state) {
-      params["address.state"] = new RegExp(`${query.state}`, "i");
-    }
-    if (query.user_id) {
-      params["owner"] = query.user_id;
+    if (query.company_id) {
+      if (!ObjectId.isValid(query.company_id)) {
+        return {
+          success: false,
+          status: 400,
+          message: constant.INVALID_OBJECTID,
+        };
+      }
+      params["company_id"] = query.company_id;
     }
     if (query.is_active) {
       params["is_active"] = query.is_active;
     }
-    if (query.industry_type) {
-      params["industry_type"] = query.industry_type;
-    }
-
-    const totalRecord = await Company.countDocuments(params);
-    const company_data = await Company.find(params)
+    const totalRecord = await Role.countDocuments(params);
+    const role_data = await Role.find(params)
       .sort(sortOptions)
       .skip((page - 1) * limit)
       .limit(limit);
-    if (company_data.length) {
+    if (role_data.length) {
       return {
         success: true,
         status: 200,
         message: constant.SUCCESS,
         totalRecord: totalRecord,
-        data: company_data,
+        data: role_data,
         next_page: totalRecord > page * limit ? true : false,
       };
     } else {
@@ -122,7 +126,7 @@ const list_company = async (query) => {
         success: true,
         status: 200,
         totalRecord: totalRecord,
-        message: constant.COMPANY.NO_RECORD,
+        message: constant.ROLE.NO_RECORD,
       };
     }
   } catch (error: any) {
@@ -131,28 +135,28 @@ const list_company = async (query) => {
   }
 };
 
-const remove_company = async (user_id, company_id) => {
+const remove_role = async (role_id: string) => {
   try {
-    if (!ObjectId.isValid(company_id)) {
+    if (!ObjectId.isValid(role_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    const company = await Company.findOne({ owner: user_id, _id: company_id });
-    if (!company) {
+    let exist = await Role.findOne({ _id: role_id });
+    if (!exist) {
       return {
         success: false,
         status: 404,
-        message: constant.COMPANY.NOT_FOUND,
+        message: constant.ROLE.NOT_FOUND,
       };
     }
-    await Company.findOneAndRemove({ _id: company_id });
+    await Role.findOneAndRemove({ _id: role_id });
     return {
       success: true,
       status: 200,
-      message: constant.COMPANY.DELETED,
+      message: constant.ROLE.DELETED,
     };
   } catch (error: any) {
     logger.error(error.toString());
@@ -161,8 +165,8 @@ const remove_company = async (user_id, company_id) => {
 };
 
 module.exports = {
-  create_company,
-  update_company,
-  list_company,
-  remove_company,
+  create_role,
+  update_role,
+  list_roles,
+  remove_role,
 };

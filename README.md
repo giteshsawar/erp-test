@@ -24,7 +24,9 @@ Warehouse Backend service consists of
 
 - Install application dependencies with : npm install
 
-- Start application: npm start development
+- Start application: npm start
+
+- to make js build: npm run build-ts
 
 ## Configuration
 
@@ -42,5 +44,5 @@ Warehouse Backend service consists of
 
 - user_signup: for signing up new users
   - parameters: phone_number,password,name
-  - body: {query:` mutation{user_signup(userInput:{phone_number:"1234567890",password:"warehouse123",name:"test"}){success status message}} `}
+  - body: {query:`mutation{user_signup(userInput:{phone_number:"1234567890",password:"warehouse123",name:"test"}){success status message}}`}
   - this returns: {success:boolean value,status:status code,message:"some message"}

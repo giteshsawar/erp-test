@@ -77,7 +77,7 @@ const update_variant_details = async (update, user_id, variant_id) => {
   }
 };
 
-const list_variant = async (query) => {
+const list_variant = async (query: any) => {
   try {
     const page = query.page ? parseInt(query.page) : 1;
     const limit = query.limit ? parseInt(query.limit) : 10;
@@ -151,7 +151,7 @@ const list_variant = async (query) => {
   }
 };
 
-const remove_variant = async (user_id, variant_id) => {
+const remove_variant = async (user_id: string, variant_id: string) => {
   try {
     if (!ObjectId.isValid(variant_id)) {
       return {
@@ -160,11 +160,11 @@ const remove_variant = async (user_id, variant_id) => {
         message: constant.INVALID_OBJECTID,
       };
     }
-    const warehouse = await ItemVariant.findOne({
+    const variant = await ItemVariant.findOne({
       owner: user_id,
       _id: variant_id,
     });
-    if (!warehouse) {
+    if (!variant) {
       return {
         success: false,
         status: 404,

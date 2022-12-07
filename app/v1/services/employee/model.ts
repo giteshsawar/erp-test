@@ -4,6 +4,8 @@ const employeeSchema = new mongoose.Schema(
   {
     name: { type: String, trim: true, required: true },
     company_id: { type: mongoose.Types.ObjectId, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
     salary: { type: Number },
     joining_date: { type: Date, required: true },
     role_id: { type: mongoose.Types.ObjectId }, //FIXME: is this field is needed here?

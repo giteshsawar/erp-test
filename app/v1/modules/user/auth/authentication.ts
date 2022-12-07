@@ -19,7 +19,7 @@ module.exports = (req, res, next) => {
   } catch (err) {
     logger.error("In user authenticate: ");
     logger.error(err);
-    return res.status(401).json({
+    res.status(401).json({
       success: false,
       status: 401,
       message: "Invalid or expired token",
@@ -43,17 +43,17 @@ module.exports = (req, res, next) => {
 
         // check if verifyid
         if (!req.user.is_verified) {
-          return res.status(401).json({
+          res.status(401).json({
             success: false,
             status: 401,
             message: "This account is not verified.",
           });
         }
         console.log(req.is_authorized);
-        return next();
+        next();
       } else {
         logger.debug("Session not found");
-        return res.status(401).json({
+        res.status(401).json({
           success: false,
           status: 401,
           message: "Invalid or expired token",

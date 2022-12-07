@@ -1,16 +1,14 @@
-/*
-    @author:Kishan
-*/
-
-const ItemCategory = require("./model");
+const Client = require("./model");
 const constant = require("../../../../config/constants").response_msgs;
 const logger = require("../../../../config/logger");
-const Company = require("../company/model");
-import { ItemCategory } from "../../../../interface";
+import { Client } from "../../../../interface";
 import mongoose from "mongoose";
+import Company, { update } from "../company/model";
+import { query } from "winston";
+import { Module } from "module";
 const ObjectId = mongoose.Types.ObjectId;
 
-const create_category = async (data: ItemCategory) => {
+const add_client = async (data: Client) => {
   try {
     if (!ObjectId.isValid(data.company_id)) {
       return {
@@ -24,16 +22,37 @@ const create_category = async (data: ItemCategory) => {
       return {
         success: false,
         status: 404,
-        message: constant.WAREHOUSE.COMPANY_NOT_FOUND,
+        message: constant.CLIENT.COMPANY_NOT_FOUND,
       };
     }
-    let new_category = await ItemCategory.create(data);
-
+    let exist_phone = await Client.findOne({
+      phone: data.phone,
+      company_id: data.company_id,
+    });
+    if (exist_phone) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.CLIENT.EXIST_PHONE,
+      };
+    }
+    let exist_email = await Client.findOne({
+      email: data.email,
+      company_id: data.company_id,
+    });
+    if (exist_email) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.CLIENT.EXIST_EMAIL,
+      };
+    }
+    let new_client = await Client.create(data);
     return {
       success: true,
       status: 200,
-      message: constant.ITEAM_CATEGORY.CREATED,
-      category: new_category,
+      message: constant.CLIENT.SUCCESS,
+      client: new_client,
     };
   } catch (error: any) {
     logger.error(error.toString());
@@ -41,39 +60,28 @@ const create_category = async (data: ItemCategory) => {
   }
 };
 
-const update_category_details = async (
-  update: ItemCategory,
-  user_id: string,
-  category_id: string
-) => {
+const update_client_details = async (update: Client, client_id: string) => {
   try {
-    if (!ObjectId.isValid(category_id)) {
+    if (!ObjectId.isValid(client_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    let warehouse = await ItemCategory.findOne({
-      owner: user_id,
-      _id: category_id,
-    });
-    if (!warehouse) {
+    let client = await Client.findOne({ _id: client_id });
+    if (!client) {
       return {
         success: false,
         status: 404,
-        message: constant.WAREHOUSE.NOT_FOUND,
+        message: constant.CLIENT.NOT_FOUND,
       };
     }
-    await ItemCategory.findOneAndUpdate(
-      { _id: category_id, owner: user_id },
-      update,
-      { new: true }
-    );
+    await Client.findOneAndUpdate({ _id: client_id }, update, { new: true });
     return {
       success: true,
       status: 200,
-      message: constant.ITEAM_CATEGORY.UPDATE,
+      message: constant.CLIENT.SUCCESS,
     };
   } catch (error: any) {
     logger.error(error.toString());
@@ -81,7 +89,7 @@ const update_category_details = async (
   }
 };
 
-const list_category = async (query: any) => {
+const list_client = async (query: any) => {
   try {
     const page = query.page ? parseInt(query.page) : 1;
     const limit = query.limit ? parseInt(query.limit) : 10;
@@ -117,28 +125,25 @@ const list_category = async (query: any) => {
       }
       params["company_id"] = query.company_id;
     }
-    if (query.user_id) {
-      params["owner"] = query.user_id;
+    if (query.phone) {
+      params["phone"] = query.phone;
     }
-    if (query.is_active) {
-      params["is_active"] = query.is_active;
-    }
-    if (query.type) {
-      params["type"] = query.type;
+    if (query.email) {
+      params["email"] = query.email;
     }
 
-    const totalRecord = await ItemCategory.countDocuments(params);
-    const category_data = await ItemCategory.find(params)
+    const totalRecord = await Client.countDocuments(params);
+    const client_data = await Client.find(params)
       .sort(sortOptions)
       .skip((page - 1) * limit)
       .limit(limit);
-    if (category_data.length) {
+    if (client_data.length) {
       return {
         success: true,
         status: 200,
         message: constant.SUCCESS,
         totalRecord: totalRecord,
-        data: category_data,
+        data: client_data,
         next_page: totalRecord > page * limit ? true : false,
       };
     } else {
@@ -146,7 +151,7 @@ const list_category = async (query: any) => {
         success: true,
         status: 200,
         totalRecord: totalRecord,
-        message: constant.ITEAM_CATEGORY.NO_RECORD,
+        message: constant.CLIENT.NO_RECORD,
       };
     }
   } catch (error: any) {
@@ -155,31 +160,30 @@ const list_category = async (query: any) => {
   }
 };
 
-const remove_category = async (user_id: string, category_id: string) => {
+const remove_client = async (client_id: string) => {
   try {
-    if (!ObjectId.isValid(category_id)) {
+    if (!ObjectId.isValid(client_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    const warehouse = await ItemCategory.findOne({
-      owner: user_id,
-      _id: category_id,
+    const client = await Client.findOne({
+      _id: client_id,
     });
-    if (!warehouse) {
+    if (!client) {
       return {
         success: false,
         status: 404,
-        message: constant.ITEAM_CATEGORY.NOT_FOUND,
+        message: constant.CLIENT.NOT_FOUND,
       };
     }
-    await ItemCategory.findOneAndRemove({ _id: category_id });
+    await Client.findOneAndRemove({ _id: client_id });
     return {
       success: true,
       status: 200,
-      message: constant.ITEAM_CATEGORY.DELETED,
+      message: constant.CLIENT.DELETED,
     };
   } catch (error: any) {
     logger.error(error.toString());
@@ -188,8 +192,8 @@ const remove_category = async (user_id: string, category_id: string) => {
 };
 
 module.exports = {
-  create_category,
-  update_category_details,
-  list_category,
-  remove_category,
+  add_client,
+  update_client_details,
+  list_client,
+  remove_client,
 };

@@ -52,12 +52,12 @@ module.exports = buildSchema(`
   #/*******all company types*******/.
     #/******company model*******/
     type Company {
-        _id: ID!
-        name: String!
-        gst_no:String!
-        phone_number: String!
-        email:String!
-        address:Address!
+        _id: ID
+        name: String
+        gst_no:String
+        phone_number: String
+        email:String
+        address:Address
         is_warehouse_address:Boolean
         locatioin:String
         owner:String
@@ -85,7 +85,7 @@ module.exports = buildSchema(`
         next_page:Boolean
     }
 
-  #/******all ware house types********/
+  #/******all warehouse types********/
     #/******warehouse model******/
     type Warehouse {
         _id:String
@@ -95,9 +95,11 @@ module.exports = buildSchema(`
         company_id:String
         owner:String
         is_active:Boolean
+        createdAt:String
+        updatedAt:String
     }
 
-    #/*****ware house comman responce******/
+    #/*****warehouse comman responce******/
     type warehouseCommanResponce {
         success:Boolean!
         status:String!
@@ -112,6 +114,85 @@ module.exports = buildSchema(`
         totalRecord:Int!
         message:String
         data: [Warehouse!]
+        next_page:Boolean
+    }
+
+  #/******item category types*******/
+    #/*****category model******/
+    type Category {
+        type:String
+        name:String
+        specification:String
+        description:String
+        units:String
+        company_id:String
+        is_active:Boolean
+        createdAt:String
+        updatedAt:String
+    }
+
+    #/******comman category responce******/
+    type categoryCommanResponce {
+        message:String!
+        status:Int!
+        success:Boolean!
+        category: Category
+    }
+
+    #/*******list category*******/
+    type ListCategory {
+        message:String
+        status:Int!
+        success:Boolean!
+        data: [Category!]
+        totalRecord:Int!
+        next_page:Boolean
+    }
+
+  #/*****iteam varient types ******/
+    #/**** price object type*****/
+    type Price {
+        amount:Int!
+        tax_includes:Int!
+        min_price:Int!
+    }
+
+    #/*****stock object type ****/
+    type Stock {
+        total:String
+        unit_id:String
+        low_stock_limit:String
+    }
+
+    #/****iteam varient model *******/
+    type Varient {
+        name:String
+        specification:String
+        image:[String!]
+        price:Price
+        stock:Stock
+        warehouse_id:String
+        expiry_range:String
+        is_active:String
+        createdAt:String
+        updatedAt:String
+    }
+
+    #/*****comman responce of variant ******/
+    type varientCommanResponce {
+        status:Int!
+        success:Boolean!
+        message:String!
+        variant:Varient
+    }
+
+    #/*******list variant*******/
+    type ListVariant {
+        message:String
+        status:Int!
+        success:Boolean!
+        data: [Varient!]
+        totalRecord:Int!
         next_page:Boolean
     }
 
@@ -210,6 +291,93 @@ module.exports = buildSchema(`
         page:String
         limit:String
         sortBy:String
+        sortOrder:String
+    }
+
+   #/*****category inputs******/
+    #/******create category input******/
+    input categoryInput {
+        name: String!
+        type:String
+        specification:String
+        description:String
+        units:String
+        company_id:String! 
+    }
+
+    #/******category update inputs*******/
+    input categoryUpdateInput {
+        name: String
+        type:String
+        specification:String
+        description:String
+        units:String
+        company_id:String
+        is_active:Boolean
+    }
+
+    #/********category quer input *******/
+    input categoryQuery {
+        _id:String
+        name:String
+        company_id:String
+        is_active:String
+        type:String
+        page:String
+        limit:String
+        sortBy:String
+        sortOrder:String
+    }
+
+  #/*****iteam variant ******/
+    #/*****price input *****/
+    input price {
+        amount:Int
+        tax_includes:Int
+        min_price:Int
+    }
+
+    #/***** stock input *****/
+    input stock {
+        total:String
+        unit_id:String
+        low_stock_limit:String
+    }
+
+    #/***** create variant ****/
+    input variantInput {
+        name:String!
+        specification:String
+        image:[String]
+        price:price
+        stock:stock
+        warehouse_id:String
+        expiry_range:String
+    }
+
+    #/***** update varient *****/
+    input variantUpdateInput {
+        name:String
+        specification:String
+        image:[String]
+        price:price
+        stock:stock
+        warehouse_id:String
+        expiry_range:String
+        is_active:Boolean
+    }
+
+    #/**** variant query inputs *****/
+    input variantQuery {
+        _id:String
+        name:String
+        warehouse_id:String
+        is_active:String
+        stock:String
+        page:String
+        limit:String
+        sortBy:String
+        sortOrder:String
     }
     
 #/**************All querys.************/
@@ -346,7 +514,7 @@ module.exports = buildSchema(`
                     #description: warehouse's active status.
                     #in: body
                     #required: false
-                    #type: booolean
+                    #type: boolean
                 #name:_id
                     #description: warehouse's id.
                     #in: body
@@ -366,6 +534,85 @@ module.exports = buildSchema(`
             #responce:
                 #success:true, status:200, message: success,
         remove_warehouse(warehouse_id:String!):commanResponce
+
+        #/******description:List of company's category.
+            #parameters:
+                #name: name
+                    #description: category's name.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: company_id
+                    #description: company's id.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: is_active
+                    #description: category's active status.
+                    #in: body
+                    #required: false
+                    #type: boolean
+                #name:_id
+                    #description: category's id.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:type
+                    #description: category's type.
+                    #in: body
+                    #required: false
+                    #type: string
+            #responce:
+                #success:true, status:200, totalRecord:numberOfRecord, data: category list,next_page:true/false
+        list_category(categoryQuery:categoryQuery):ListCategory
+
+        #/******description:remove category.*******/
+            #parameters:
+                #name: category_id
+                    #description: company's category id.
+                    #in: body
+                    #required: true
+                    #type: string
+            #responce:
+                #success:true, status:200, message: success,
+        remove_category(category_id:String!):commanResponce
+
+        #/******description:List of company's variant.
+            #parameters:
+                #name: name
+                    #description: variant's name.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: warehouse_id
+                    #description: warehouse_id's id.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: is_active
+                    #description: category's active status.
+                    #in: body
+                    #required: false
+                    #type: boolean
+                #name:stock
+                    #description: stock.
+                    #in: body
+                    #required: false
+                    #type: string
+            #responce:
+                #success:true, status:200, totalRecord:numberOfRecord, data: category list,next_page:true/false
+        list_variant(variantQuery:variantQuery):ListVariant
+
+        #/******description:remove variant.*******/
+            #parameters:
+                #name: variant_id
+                    #description: company's variant id.
+                    #in: body
+                    #required: true
+                    #type: string
+            #responce:
+                #success:true, status:200, message: success,
+        remove_variant(variant_id:String!):commanResponce
     }
 
 #All Mutations
@@ -594,10 +841,165 @@ module.exports = buildSchema(`
             #responce:
                 #success:true, status:200, message: success, warehouse:warehouse object
         update_warehouse_details(warehouseUpdateInput:warehouseUpdateInput,warehouse_id:String!):warehouseCommanResponce
+
+        #/*******description: create category.********/
+            #parameters:
+                #name: name
+                    #description: category's name.
+                    #in: body
+                    #required: true
+                    #type: string
+                #name: type
+                    #description: category's type.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: specification
+                    #description: category specification.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: description
+                    #description: category's description.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: units
+                    #description: units.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:company_id
+                    #description: company id of category.
+                    #in: body
+                    #required: true
+                    #type: string
+            #responce:
+                #success:true, status:200, message: success, category:category object
+        create_category(categoryInput:categoryInput):categoryCommanResponce
+
+        #/*******description: update category details.********/
+            #parameters:
+                #name: name
+                    #description: category's name.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: type
+                    #description: category's type.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: specification
+                    #description: category specification.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: description
+                    #description: category's description.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: units
+                    #description: units.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:company_id
+                    #description: company id of category.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:is_active
+                    #description: set active satatus.
+                    #in: body
+                    #required: false
+                    #type: boolean
+            #responce:
+                #success:true, status:200, message: success, category:category object
+        update_category_details(categoryUpdateInput:categoryUpdateInput,category_id:String!):commanResponce
+
+        #/*******description: create variant.********/
+            #parameters:
+                #name: name
+                    #description: variant's name.
+                    #in: body
+                    #required: true
+                    #type: string
+                #name: specification
+                    #description: variant specification.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: price
+                    #description: amount,tax_includes and min_price.
+                    #in: body
+                    #required: false
+                    #type: int
+                #name:warehouse_id
+                    #description: warehouse id.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:stock
+                    #description: total,unit_id and low_stock_limit.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:expiry_range
+                    #description: expiry_range of iteam.
+                    #in: body
+                    #required: false
+                    #type: string
+            #responce:
+                #success:true, status:200, message: success, variant:category object
+        create_variant(variantInput:variantInput):varientCommanResponce
+
+        #/*******description: update variant details.********/
+            #parameters:
+                #name: name
+                    #description: variant's name.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: specification
+                    #description: variant specification.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name: price
+                    #description: amount,tax_includes and min_price.
+                    #in: body
+                    #required: false
+                    #type: int
+                #name:warehouse_id
+                    #description: warehouse id.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:stock
+                    #description: total,unit_id and low_stock_limit.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:expiry_range
+                    #description: expiry_range of iteam.
+                    #in: body
+                    #required: false
+                    #type: string
+                #name:is_active
+                    #description: set active status.
+                    #in: body
+                    #required: false
+                    #type: boolean
+            #responce:
+                #success:true, status:200, message: success
+        update_variant_details(variantUpdateInput:variantUpdateInput,variant_id:String!):commanResponce
     }
 
+
     schema {
-        query: RootQuery,
+        query: RootQuery
         mutation:RootMutation
     } 
 `);

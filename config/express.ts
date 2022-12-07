@@ -3,12 +3,13 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const { graphqlHTTP } = require("express-graphql");
 const rateLimiter = require("express-rate-limit");
-
+const auth = require("../app/v1/modules/user/auth/authentication");
 const controller = require("../app/v1/modules/user/controller");
-const graphqlSchema = require("../app/v1/modules/user/graphql_schema");
+const graphql_schema = require("../app/v1/modules/user/graphql_schema");
+const { makeExecutableSchema } = require("@graphql-tools/schema");
+const { applyMiddleware } = require("graphql-middleware");
 
 import logger from "./logger";
-
 module.exports = function (app: any, config: any) {
   // set up environment for the application
   let env = require("./env");
@@ -29,7 +30,7 @@ module.exports = function (app: any, config: any) {
   app.use(
     `/api/${config.app.webApi}/deadend`,
     graphqlHTTP({
-      schema: graphqlSchema,
+      schema: graphql_schema,
       rootValue: controller,
       graphiql: true,
     })

@@ -62,5 +62,30 @@
     "NO_RECORD": "No record found",
     "DELETED": "Deleted successful",
     "ITEAM_CATEGORY": "Company not found with given id "
+  },
+  "ROLE": {
+    "EXIST": "Role with this name already exist.",
+    "COMPANY_NOT_FOUND": "Company not found with given id ",
+    "SUCCESS": "Role created",
+    "NOT_FOUND": "Role not found with given id",
+    "UPDATE": "Update successfully",
+    "DELETED": "Deleted successful"
+  },
+  "CLIENT": {
+    "PHONE_EXIST": "Phone number is already registered with this company",
+    "EMAIL_EXIST": "Email is already ragistered with this company",
+    "COMPANY_NOT_FOUND": "Company not found with given id ",
+    "SUCCESS": "Client added successfuly",
+    "NOT_FOUND": "Client not found with given id",
+    "UPDATE": "Client details updated successfuly",
+    "DELETED": "Deleted successful"
+  },
+  "DESIGNATION": {
+    "COMPANY_NOT_FOUND": "Company not found with given id ",
+    "EXIST": "Designation with this name already exist.",
+    "SUCCESS": "Designation created",
+    "NOT_FOUND": "Designation not found with given id",
+    "UPDATE": "Update successfully",
+    "DELETED": "Deleted successful"
   }
 }

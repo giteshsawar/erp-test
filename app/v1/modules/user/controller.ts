@@ -1,4 +1,6 @@
+import { Request } from "express";
 import logger from "../../../../config/logger";
+const { auth } = require("./auth/authentication");
 const {
   user_signup,
   verify_otp,
@@ -41,11 +43,10 @@ const {
 const User = require("../../services/user/model");
 const constant = require("../../../../config/constants").response_msgs;
 let controller = Object.create(null);
-
 /* 
 All user auth related controllers
 */
-controller.user_signup = async (data, req, res) => {
+controller.user_signup = async (data, req, context, res) => {
   try {
     const result = await user_signup(data.userInput);
     return result; //res.status(result.status).json(result);
@@ -155,7 +156,6 @@ controller.update_user = async (updateUserInput, req) => {
       };
     }
     let update = updateUserInput.updateUserInput;
-    console.log(update);
     let user_id = req.user._id;
     const result = await update_user(update, user_id);
     return result;
@@ -334,7 +334,7 @@ controller.remove_warehouse = async ({ warehouse_id }, req) => {
 };
 
 /**
- * iteam controllers
+ * iteam variant controllers
  */
 controller.create_variant = async ({ variantInput }, req) => {
   try {
@@ -355,4 +355,235 @@ controller.create_variant = async ({ variantInput }, req) => {
   }
 };
 
+controller.update_variant_details = async (
+  { variantUpdateInput, variant_id },
+  req
+) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    const result = await update_variant_details(
+      variantUpdateInput,
+      req.user._id,
+      variant_id
+    );
+    return result;
+  } catch (error: any) {
+    logger.error("Error while update_variant_details");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while update_variant_details`);
+  }
+};
+
+controller.list_variant = async ({ variantQuery }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    variantQuery.owner = req.user._id;
+    const result = await list_variant(variantQuery);
+    return result;
+  } catch (error: any) {
+    logger.error("Error while create_variant");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while create_variant`);
+  }
+};
+
+controller.remove_variant = async ({ variant_id }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    const result = await remove_variant(user_id, variant_id);
+    return result;
+  } catch (error: any) {
+    logger.error("Error while remove_variant");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while remove_variant`);
+  }
+};
+
+/**
+ * Item category controllers.
+ */
+controller.create_category = async ({ categoryInput }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    categoryInput.owner = req.user._id;
+    const result = await create_category(categoryInput);
+    return result;
+  } catch (error: any) {
+    logger.error("Error while create_category");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while create_category`);
+  }
+};
+
+controller.update_category_details = async (
+  { categoryUpdateInput, category_id },
+  req
+) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    const result = await update_category_details(
+      categoryUpdateInput,
+      user_id,
+      category_id
+    );
+    return result;
+  } catch (error: any) {
+    logger.error("Error while update_category_details");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while update_category_details`);
+  }
+};
+
+controller.list_category = async ({ categoryQuery }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    categoryQuery.user_id = req.user._id;
+    const result = await list_category(categoryQuery);
+    return result;
+  } catch (error: any) {
+    logger.error("Error while list_category");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while list_category`);
+  }
+};
+
+controller.remove_category = async ({ category_id }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    const result = await remove_category(user_id, category_id);
+    return result;
+  } catch (error: any) {
+    logger.error("Error while remove_category");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while remove_category`);
+  }
+};
+
+/**
+ * item controller
+ */
+controller.add_item = async ({ itemInput }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    itemInput.owner = req.user._id;
+    const result = await add_item(itemInput);
+    return result;
+  } catch (error: any) {
+    logger.error("Error while add_item");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while add_item`);
+  }
+};
+
+controller.update_iteam_details = async ({ itemUpdateInput, item_id }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    const result = await update_iteam_details(
+      itemUpdateInput,
+      user_id,
+      item_id
+    );
+    return result;
+  } catch (error: any) {
+    logger.error("Error while update_iteam_details");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while update_iteam_details`);
+  }
+};
+
+controller.list_item = async ({ itemQuery }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    itemQuery.user_id = req.user._id;
+    const result = await list_item(itemQuery);
+    return result;
+  } catch (error: any) {
+    logger.error("Error while list_item");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while list_item`);
+  }
+};
+
+controller.remove_item = async ({ item_id }, req) => {
+  try {
+    if (!req.is_authorized) {
+      return {
+        success: false,
+        status: 401,
+        message: constant.INVALID_TOKEN,
+      };
+    }
+    let user_id = req.user._id;
+    const result = await remove_item(user_id, item_id);
+    return result;
+  } catch (error: any) {
+    logger.error("Error while remove_item");
+    logger.error(error.toString());
+    throw new Error(`${error.toString()},while remove_item`);
+  }
+};
 module.exports = controller;

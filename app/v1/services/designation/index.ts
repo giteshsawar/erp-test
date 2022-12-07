@@ -1,16 +1,12 @@
-/*
-    @author:Kishan
-*/
-
-const ItemCategory = require("./model");
+const Designation = require("./model");
 const constant = require("../../../../config/constants").response_msgs;
 const logger = require("../../../../config/logger");
+import { Designation } from "../../../../interface";
 const Company = require("../company/model");
-import { ItemCategory } from "../../../../interface";
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
 
-const create_category = async (data: ItemCategory) => {
+const create_designation = async (data: Designation) => {
   try {
     if (!ObjectId.isValid(data.company_id)) {
       return {
@@ -24,16 +20,26 @@ const create_category = async (data: ItemCategory) => {
       return {
         success: false,
         status: 404,
-        message: constant.WAREHOUSE.COMPANY_NOT_FOUND,
+        message: constant.DESIGNATION.COMPANY_NOT_FOUND,
       };
     }
-    let new_category = await ItemCategory.create(data);
-
+    let exist = await Designation.findOne({
+      name: data.name,
+      company_id: data.company_id,
+    });
+    if (exist) {
+      return {
+        success: false,
+        status: 400,
+        message: constant.DESIGNATION.EXIST,
+      };
+    }
+    let new_designation = await Designation.create(data);
     return {
       success: true,
       status: 200,
-      message: constant.ITEAM_CATEGORY.CREATED,
-      category: new_category,
+      message: constant.DESIGNATION.SUCCESS,
+      designation: new_designation,
     };
   } catch (error: any) {
     logger.error(error.toString());
@@ -41,39 +47,33 @@ const create_category = async (data: ItemCategory) => {
   }
 };
 
-const update_category_details = async (
-  update: ItemCategory,
-  user_id: string,
-  category_id: string
+const update_designation_detais = async (
+  update: Designation,
+  designation_id: string
 ) => {
   try {
-    if (!ObjectId.isValid(category_id)) {
+    if (!ObjectId.isValid(designation_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    let warehouse = await ItemCategory.findOne({
-      owner: user_id,
-      _id: category_id,
-    });
-    if (!warehouse) {
+    let designation = await Designation.findOne({ _id: designation_id });
+    if (!designation) {
       return {
         success: false,
         status: 404,
-        message: constant.WAREHOUSE.NOT_FOUND,
+        message: constant.DESIGNATION.NOT_FOUND,
       };
     }
-    await ItemCategory.findOneAndUpdate(
-      { _id: category_id, owner: user_id },
-      update,
-      { new: true }
-    );
+    await Designation.findOneAndUpdate({ _id: designation_id }, update, {
+      new: true,
+    });
     return {
       success: true,
       status: 200,
-      message: constant.ITEAM_CATEGORY.UPDATE,
+      message: constant.DESIGNATION.UPDATE,
     };
   } catch (error: any) {
     logger.error(error.toString());
@@ -81,7 +81,7 @@ const update_category_details = async (
   }
 };
 
-const list_category = async (query: any) => {
+const list_designation = async (query: any) => {
   try {
     const page = query.page ? parseInt(query.page) : 1;
     const limit = query.limit ? parseInt(query.limit) : 10;
@@ -93,7 +93,6 @@ const list_category = async (query: any) => {
     };
 
     let params = Object.create(null);
-
     if (query._id) {
       if (!ObjectId.isValid(query._id)) {
         return {
@@ -117,28 +116,24 @@ const list_category = async (query: any) => {
       }
       params["company_id"] = query.company_id;
     }
-    if (query.user_id) {
-      params["owner"] = query.user_id;
-    }
     if (query.is_active) {
       params["is_active"] = query.is_active;
     }
-    if (query.type) {
-      params["type"] = query.type;
+    if (query.level) {
+      params["level"] = query.level;
     }
-
-    const totalRecord = await ItemCategory.countDocuments(params);
-    const category_data = await ItemCategory.find(params)
+    const totalRecord = await Designation.countDocuments(params);
+    const designation_data = await Designation.find(params)
       .sort(sortOptions)
       .skip((page - 1) * limit)
       .limit(limit);
-    if (category_data.length) {
+    if (designation_data.length) {
       return {
         success: true,
         status: 200,
         message: constant.SUCCESS,
         totalRecord: totalRecord,
-        data: category_data,
+        data: designation_data,
         next_page: totalRecord > page * limit ? true : false,
       };
     } else {
@@ -146,7 +141,7 @@ const list_category = async (query: any) => {
         success: true,
         status: 200,
         totalRecord: totalRecord,
-        message: constant.ITEAM_CATEGORY.NO_RECORD,
+        message: constant.DESIGNATION.NOT_FOUND,
       };
     }
   } catch (error: any) {
@@ -155,41 +150,37 @@ const list_category = async (query: any) => {
   }
 };
 
-const remove_category = async (user_id: string, category_id: string) => {
+const remove_designation = async (designation_id: string) => {
   try {
-    if (!ObjectId.isValid(category_id)) {
+    if (!ObjectId.isValid(designation_id)) {
       return {
         success: false,
         status: 400,
         message: constant.INVALID_OBJECTID,
       };
     }
-    const warehouse = await ItemCategory.findOne({
-      owner: user_id,
-      _id: category_id,
-    });
-    if (!warehouse) {
+    let exist = await Designation.findOne({ _id: designation_id });
+    if (!exist) {
       return {
         success: false,
         status: 404,
-        message: constant.ITEAM_CATEGORY.NOT_FOUND,
+        message: constant.DESIGNATION.NOT_FOUND,
       };
     }
-    await ItemCategory.findOneAndRemove({ _id: category_id });
+    await Designation.findOneAndRemove({ _id: designation_id });
     return {
       success: true,
       status: 200,
-      message: constant.ITEAM_CATEGORY.DELETED,
+      message: constant.DESIGNATION.DELETED,
     };
   } catch (error: any) {
     logger.error(error.toString());
     throw error;
   }
 };
-
 module.exports = {
-  create_category,
-  update_category_details,
-  list_category,
-  remove_category,
+  create_designation,
+  update_designation_detais,
+  list_designation,
+  remove_designation,
 };
